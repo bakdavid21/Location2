@@ -2,6 +2,7 @@ package com.example.locationchecker
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -23,6 +24,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var findButton: Button
     private lateinit var binding: ActivityMapsBinding
 
+    companion object {
+        private const val TAG = "MapsActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -42,6 +47,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val location = snapshot.child("test").getValue(LocInfo::class.java)
                 val locationLat = location?.latitude
                 val locationLong = location?.longitude
+
+                findButton.setOnClickListener {
+                    if (locationLat != null && locationLong != null) {
+                        val latLng = LatLng(locationLat, locationLong)
+
+                        map.addMarker(MarkerOptions().position(latLng).title("A felhasználó jelenleg itt van!"))
+                        val update = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f)
+
+                        map.moveCamera(update)
+                    }
+                    else {
+                        Log.e(TAG, "A felhasználó nem található!")
+                    }
+                }
             }
         }
 
